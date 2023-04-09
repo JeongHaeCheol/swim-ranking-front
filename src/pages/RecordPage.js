@@ -139,13 +139,13 @@ export default function UserPage() {
   return (
     <>
       <Helmet>
-        <title> 기록 | Minimal UI </title>
+        <title> 대회기록 | Minimal UI </title>
       </Helmet>
 
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            기록
+            대회기록
           </Typography>
           <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
             New User

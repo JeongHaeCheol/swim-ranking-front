@@ -1,8 +1,14 @@
 import { Helmet } from 'react-helmet-async';
 import { faker } from '@faker-js/faker';
+
 // @mui
 import { useTheme } from '@mui/material/styles';
 import { Grid, Container, Typography } from '@mui/material';
+
+import { useEffect, useState } from 'react';
+import { getTrend } from '../api/eventResult';
+
+
 // components
 import Iconify from '../components/iconify';
 // sections
@@ -18,10 +24,32 @@ import {
   AppConversionRates,
 } from '../sections/@dashboard/app';
 
+
+
+
 // ----------------------------------------------------------------------
 
 export default function DashboardAppPage() {
   const theme = useTheme();
+
+  const [trend, setTrend] = useState({ version: 0, result: null });
+
+  useEffect(() => {
+    getTrend(1, 2).then(
+      (res) =>  setTrend(
+        {
+          version: trend.version + 1,
+          result: res
+        }
+
+      )
+    ); 
+    
+  }, []);
+
+
+
+  console.log(trend);
 
   return (
     <>
@@ -31,11 +59,11 @@ export default function DashboardAppPage() {
 
       <Container maxWidth="xl">
         <Typography variant="h4" sx={{ mb: 5 }}>
-          Hi, Welcome back
+          내기록
         </Typography>
 
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={3}>
+          {/* <Grid item xs={12} sm={6} md={3}>
             <AppWidgetSummary title="Weekly Sales" total={714000} icon={'ant-design:android-filled'} />
           </Grid>
 
@@ -49,9 +77,27 @@ export default function DashboardAppPage() {
 
           <Grid item xs={12} sm={6} md={3}>
             <AppWidgetSummary title="Bug Reports" total={234} color="error" icon={'ant-design:bug-filled'} />
-          </Grid>
+          </Grid> */}
 
           <Grid item xs={12} md={6} lg={8}>
+            <AppWebsiteVisits
+              title="기록변화 추이"
+              subheader={"자유형 50"}
+              chartLabels={trend.result && trend.result.map(row => row.date)}
+              chartData={[
+                {
+                  name: '자유형 50',
+                  type: 'area',
+                  fill: 'gradient',
+                  data: trend.result && trend.result.map(row => row.raceTime),
+                },
+              ]}
+            />
+          </Grid>
+
+
+
+          {/* <Grid item xs={12} md={6} lg={8}>
             <AppWebsiteVisits
               title="Website Visits"
               subheader="(+43%) than last year"
@@ -89,7 +135,7 @@ export default function DashboardAppPage() {
                 },
               ]}
             />
-          </Grid>
+          </Grid> */}
 
           <Grid item xs={12} md={6} lg={4}>
             <AppCurrentVisits
