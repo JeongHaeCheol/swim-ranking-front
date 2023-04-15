@@ -1,9 +1,15 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 // @mui
 import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
+
+
+import { useNavigate } from 'react-router-dom';
+
+import {AuthContext} from '../../../sections/auth/login/AuthContext'
 // mocks_
 import account from '../../../_mock/account';
+
 
 // ----------------------------------------------------------------------
 
@@ -26,6 +32,16 @@ const MENU_OPTIONS = [
 
 export default function AccountPopover() {
   const [open, setOpen] = useState(null);
+  const navigate = useNavigate();
+  const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
+
+
+  const logOut = () => {
+    setIsAuthenticated(false);
+    navigate('/dashboard/record', { replace: true });
+    console.log("logOut");
+  }
+  
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -97,7 +113,7 @@ export default function AccountPopover() {
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        <MenuItem onClick={handleClose} sx={{ m: 1 }}>
+        <MenuItem onClick={() => logOut()} sx={{ m: 1 }}>
           Logout
         </MenuItem>
       </Popover>

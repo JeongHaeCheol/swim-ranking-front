@@ -1,4 +1,6 @@
 import { Navigate, useRoutes } from 'react-router-dom';
+import { useContext } from 'react';
+
 // layouts
 import DashboardLayout from './layouts/dashboard';
 import SimpleLayout from './layouts/simple';
@@ -9,8 +11,13 @@ import LoginPage from './pages/LoginPage';
 import Page404 from './pages/Page404';
 import ProductsPage from './pages/ProductsPage';
 import DashboardAppPage from './pages/DashboardAppPage';
+import MyPoolRecordPage from './pages/MyPoolRecordPage';
+import {AuthContext} from './sections/auth/login/AuthContext'
 
 // ----------------------------------------------------------------------
+
+
+
 
 export default function Router() {
   const routes = useRoutes([
@@ -21,6 +28,7 @@ export default function Router() {
         { element: <Navigate to="/dashboard/app" />, index: true },
         { path: 'app', element: <DashboardAppPage /> },
         { path: 'record', element: <RecordPage /> },
+        { path: 'mypoolrecord', element: <MyPoolRecordPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
       ],

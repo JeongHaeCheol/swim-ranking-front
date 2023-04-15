@@ -1,11 +1,18 @@
 import ReactDOM from 'react-dom/client';
 
+import axios from 'axios';
+
 //
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import reportWebVitals from './reportWebVitals';
 
+
 // ----------------------------------------------------------------------
+
+
+// 쿠키를 주고 받기 위한 설정
+axios.defaults.withCredentials = true;
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 

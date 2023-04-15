@@ -33,7 +33,7 @@ import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // mock
 // 테스트용 유저데이터를 갖고 있음
 import USERLIST from '../_mock/user';
-import { eventResult } from '../api/eventResult';
+import { swimmingPool } from '../api/swimmingPool';
 
 
 // ----------------------------------------------------------------------
@@ -42,16 +42,13 @@ import { eventResult } from '../api/eventResult';
 const TABLE_HEAD2 = [
   { id: 'name', label: '이름', alignRight: false },
   { id: 'gender', label: '성별', alignRight: false },
-  { id: 'stroke', label: '종목', alignRight: false },
-  { id: 'distance', label: '거리', alignRight: false },
-  { id: 'raceTime', label: '기록', alignRight: false },
-  { id: 'raceRank', label: '순위', alignRight: false },
-  { id: 'competitionName', label: '대회명', alignRight: false },
-  { id: 'competitionDate', label: '개최날짜', alignRight: false },
+  { id: 'birth', label: '생년월일', alignRight: false },
+  { id: 'event', label: '종목', alignRight: false },
+  { id: 'record', label: '기록', alignRight: false },
+  { id: 'measuredDate', label: '측정날짜', alignRight: false },
   
   { id: '' },
 ];
-
 // ----------------------------------------------------------------------
 
 function descendingComparator(a, b, orderBy) {
@@ -83,7 +80,7 @@ function getComparator(order, orderBy) {
 //   return stabilizedThis.map((el) => el[0]);
 // }
 
-export default function RecordPage() {
+export default function MyPoolRecordPage() {
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -101,7 +98,7 @@ export default function RecordPage() {
 
 
 
-  const [eventResults, setEventResults] = useState({version: 0, result: null});
+  const [unOfficialRecord, setUnOfficialRecord] = useState({version: 0, result: null});
 
 
 
@@ -119,33 +116,33 @@ export default function RecordPage() {
     setFilterName(event.target.value);
 
     try{
-      const responseData = await eventResult(event.target.value);
-      const newResult = {
-        version: eventResults.version + 1,
+      const responseData = await swimmingPool(event.target.value);
+      const nr = {
+        version: unOfficialRecord.version + 1,
         result: responseData
       }
-      setEventResults(newResult);
-      console.log(eventResults);
+      setUnOfficialRecord(nr);
+      console.log(unOfficialRecord);
     } catch (error) {
       console.error(error);
     }
     
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - eventResults.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - unOfficialRecord.length) : 0;
 
-  const isNotFound = !eventResults.result && !!filterName;
+  const isNotFound = !unOfficialRecord.result && !!filterName;
 
   return (
     <>
       <Helmet>
-        <title> 대회기록 | Minimal UI </title>
+        <title> 내수영장 기록 | Minimal UI </title>
       </Helmet>
 
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            대회기록
+            내 수영장 기록
           </Typography>
           <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
             New User
@@ -162,7 +159,7 @@ export default function RecordPage() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD2}
-                  rowCount={eventResults.length}
+                  rowCount={unOfficialRecord.length}
                   numSelected={selected.length}
               
                 />
@@ -170,7 +167,7 @@ export default function RecordPage() {
 
                 <TableBody>
                   {
-                  eventResults.result !== null && eventResults.result !== "result : no data" && eventResults.result.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                  unOfficialRecord.result !== null && unOfficialRecord.result !== "result : no data" && unOfficialRecord.result.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                     console.log("### TEST");
                     console.log(row);
                     const { name, gender, stroke, distance, raceTime, raceRank, competitionName, competitionDate } = row;
@@ -193,17 +190,13 @@ export default function RecordPage() {
 
                         <TableCell align="left">{row.gender}</TableCell>
 
-                        <TableCell align="left">{row.stroke}</TableCell>
+                        <TableCell align="left">{row.birth}</TableCell>
 
-                        <TableCell align="left">{row.distance}</TableCell>
+                        <TableCell align="left">{row.event}</TableCell>
 
-                        <TableCell align="left">{row.raceTime}</TableCell>
+                        <TableCell align="left">{row.record}</TableCell>
 
-                        <TableCell align="left">{row.raceRank}</TableCell>
-
-                        <TableCell align="left">{row.competitionName}</TableCell>
-
-                        <TableCell align="left">{row.competitionDate}</TableCell>
+                        <TableCell align="left">{row.measuredDate}</TableCell>
 
                         {/* <TableCell align="left">{isVerified ? 'Yes' : 'No'}</TableCell>
 
@@ -256,7 +249,7 @@ export default function RecordPage() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={eventResults.length}
+            count={unOfficialRecord.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
@@ -265,34 +258,7 @@ export default function RecordPage() {
         </Card>
       </Container>
 
-      {/* <Popover
-        open={Boolean(open)}
-        anchorEl={open}
-        onClose={handleCloseMenu}
-        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{
-          sx: {
-            p: 1,
-            width: 140,
-            '& .MuiMenuItem-root': {
-              px: 1,
-              typography: 'body2',
-              borderRadius: 0.75,
-            },
-          },
-        }}
-      >
-        <MenuItem>
-          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
-
-        <MenuItem sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
-          Delete
-        </MenuItem>
-      </Popover> */}
+      
     </>
   );
 }

@@ -17,6 +17,11 @@ const navConfig = [
     icon: icon('ic_user'),
   },
   {
+    title: '내수영장기록',
+    path: '/dashboard/mypoolrecord',
+    icon: icon('ic_user'),
+  },
+  {
     title: '상품',
     path: '/dashboard/products',
     icon: icon('ic_cart'),
