@@ -17,5 +17,21 @@ const swimmingPool = async (nameParam) => {
 }
 
 
+const getPercentileRank = async (swimmerId, poolName) => {
 
-export { swimmingPool };
+  try {
+    const response = await axios.get('/my-percentage'
+      , { params: { swimmerId, poolName } }
+    )
+    const responseData = response.data;
+    return responseData;
+  } catch (error) {
+    console.error(error);
+  }
+
+  return null;
+
+}
+
+
+export { swimmingPool, getPercentileRank };

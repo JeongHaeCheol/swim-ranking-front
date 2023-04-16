@@ -33,7 +33,7 @@ import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // mock
 // 테스트용 유저데이터를 갖고 있음
 import USERLIST from '../_mock/user';
-import { swimmingPool } from '../api/swimmingPool';
+import { swimmingPool , getPercentileRank} from '../api/swimmingPool';
 
 
 // ----------------------------------------------------------------------
@@ -45,6 +45,7 @@ const TABLE_HEAD2 = [
   { id: 'birth', label: '생년월일', alignRight: false },
   { id: 'event', label: '종목', alignRight: false },
   { id: 'record', label: '기록', alignRight: false },
+  { id: 'officialCheck', label: '공식기록여부', alignRight: false },
   { id: 'measuredDate', label: '측정날짜', alignRight: false },
   
   { id: '' },
@@ -98,8 +99,8 @@ export default function MyPoolRecordPage() {
 
 
 
-  const [unOfficialRecord, setUnOfficialRecord] = useState({version: 0, result: null});
-
+  const [swimRecord, setSwimRecord] = useState({version: 0, result: null});
+  const [pecentage, setPecentage] = useState(0);
 
 
   const handleChangePage = (event, newPage) => {
@@ -116,22 +117,25 @@ export default function MyPoolRecordPage() {
     setFilterName(event.target.value);
 
     try{
+      const pecentage = await getPercentileRank(1, event.target.value);
       const responseData = await swimmingPool(event.target.value);
       const nr = {
-        version: unOfficialRecord.version + 1,
+        version: swimRecord.version + 1,
         result: responseData
       }
-      setUnOfficialRecord(nr);
-      console.log(unOfficialRecord);
+      setSwimRecord(nr);
+      setPecentage(pecentage);
+      console.log(swimRecord);
+      console.log(pecentage);
     } catch (error) {
       console.error(error);
     }
     
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - unOfficialRecord.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - swimRecord.length) : 0;
 
-  const isNotFound = !unOfficialRecord.result && !!filterName;
+  const isNotFound = !swimRecord.result && !!filterName;
 
   return (
     <>
@@ -141,7 +145,7 @@ export default function MyPoolRecordPage() {
 
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-          <Typography variant="h4" gutterBottom>
+          <Typography variant="h3" gutterBottom>
             내 수영장 기록
           </Typography>
           <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
@@ -152,6 +156,13 @@ export default function MyPoolRecordPage() {
         <Card>
           <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
 
+
+          <Typography variant="h7" gutterBottom>
+            <div style={{padding: "20px"}}>
+            내 기록은 상위 {pecentage} % 입니다.
+            </div>
+          </Typography>
+
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
@@ -159,7 +170,7 @@ export default function MyPoolRecordPage() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD2}
-                  rowCount={unOfficialRecord.length}
+                  rowCount={swimRecord.length}
                   numSelected={selected.length}
               
                 />
@@ -167,7 +178,7 @@ export default function MyPoolRecordPage() {
 
                 <TableBody>
                   {
-                  unOfficialRecord.result !== null && unOfficialRecord.result !== "result : no data" && unOfficialRecord.result.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                  swimRecord.result !== null && swimRecord.result !== "result : no data" && swimRecord.result.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                     console.log("### TEST");
                     console.log(row);
                     const { name, gender, stroke, distance, raceTime, raceRank, competitionName, competitionDate } = row;
@@ -195,6 +206,8 @@ export default function MyPoolRecordPage() {
                         <TableCell align="left">{row.event}</TableCell>
 
                         <TableCell align="left">{row.record}</TableCell>
+
+                        <TableCell align="left">{row.officialCheck ? "공식" : "비공식"}</TableCell>
 
                         <TableCell align="left">{row.measuredDate}</TableCell>
 
@@ -249,7 +262,7 @@ export default function MyPoolRecordPage() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={unOfficialRecord.length}
+            count={swimRecord.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
